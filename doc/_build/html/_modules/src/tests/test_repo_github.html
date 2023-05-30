@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.tests.test_repo_github &mdash; Continuous-Integration 1.0.0 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> Continuous-Integration
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">Continuous-Integration</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Continuous-Integration</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">src.tests.test_repo_github</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for src.tests.test_repo_github</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">os.path</span>
+<span class="kn">from</span> <span class="nn">unittest</span> <span class="kn">import</span> <span class="n">TestCase</span>
+<span class="kn">from</span> <span class="nn">src.app.repo_github</span> <span class="kn">import</span> <span class="n">RepoGitHub</span>
+<span class="sd">&quot;&quot;&quot;TestRepoGitHub&quot;&quot;&quot;</span>
+
+
+<div class="viewcode-block" id="TestRepoGitHub"><a class="viewcode-back" href="../../../src.tests.html#src.tests.test_repo_github.TestRepoGitHub">[docs]</a><span class="k">class</span> <span class="nc">TestRepoGitHub</span><span class="p">(</span><span class="n">TestCase</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;TestRepoGitHub class</span>
+
+<span class="sd">    contains the test cases for repository cloning and removing</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="TestRepoGitHub.test_clone_repo_pos"><a class="viewcode-back" href="../../../src.tests.html#src.tests.test_repo_github.TestRepoGitHub.test_clone_repo_pos">[docs]</a>    <span class="k">def</span> <span class="nf">test_clone_repo_pos</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Positive test for cloning repository</span>
+
+<span class="sd">        Check whether the function cloneRepo() succeeds to clone the repo to a local directory</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;testcases/test_clone_repo_pos.txt&quot;</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">dataJSON_str</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+            <span class="n">dataJSON</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">dataJSON_str</span><span class="p">)</span>
+            <span class="n">repoGitHub</span> <span class="o">=</span> <span class="n">RepoGitHub</span><span class="p">(</span><span class="n">dataJSON</span><span class="p">)</span>
+            <span class="n">repoGitHub</span><span class="o">.</span><span class="n">cloneRepo</span><span class="p">(</span><span class="s2">&quot;result.txt&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">repoGitHub</span><span class="o">.</span><span class="n">repo_folder_name</span><span class="p">))</span>
+        <span class="n">repoGitHub</span><span class="o">.</span><span class="n">removeRepo</span><span class="p">(</span><span class="s2">&quot;result.txt&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TestRepoGitHub.test_clone_repo_neg"><a class="viewcode-back" href="../../../src.tests.html#src.tests.test_repo_github.TestRepoGitHub.test_clone_repo_neg">[docs]</a>    <span class="k">def</span> <span class="nf">test_clone_repo_neg</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Negative test for cloning repository</span>
+
+<span class="sd">        Check whether the function cloneRepo() fails to clone the repo to a local directory</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;testcases/test_clone_repo_neg.txt&quot;</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">dataJSON_str</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+            <span class="n">dataJSON</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">dataJSON_str</span><span class="p">)</span>
+            <span class="n">repoGitHub</span> <span class="o">=</span> <span class="n">RepoGitHub</span><span class="p">(</span><span class="n">dataJSON</span><span class="p">)</span>
+            <span class="n">repo_folder_name_origin</span> <span class="o">=</span> <span class="n">repoGitHub</span><span class="o">.</span><span class="n">repo_folder_name</span>
+            <span class="n">repoGitHub</span><span class="o">.</span><span class="n">repo_folder_name</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span>
+            <span class="n">repoGitHub</span><span class="o">.</span><span class="n">cloneRepo</span><span class="p">(</span><span class="s2">&quot;result.txt&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertFalse</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">repo_folder_name_origin</span><span class="p">))</span>
+        <span class="n">repoGitHub</span><span class="o">.</span><span class="n">removeRepo</span><span class="p">(</span><span class="s2">&quot;result.txt&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TestRepoGitHub.test_remove_repo_pos"><a class="viewcode-back" href="../../../src.tests.html#src.tests.test_repo_github.TestRepoGitHub.test_remove_repo_pos">[docs]</a>    <span class="k">def</span> <span class="nf">test_remove_repo_pos</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Positive test for removing repository</span>
+
+<span class="sd">        Check whether the function removeRepo() succeeds to remove the repo from a local directory</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;testcases/test_clone_repo_pos.txt&quot;</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">dataJSON_str</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+            <span class="n">dataJSON</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">dataJSON_str</span><span class="p">)</span>
+            <span class="n">repoGitHub</span> <span class="o">=</span> <span class="n">RepoGitHub</span><span class="p">(</span><span class="n">dataJSON</span><span class="p">)</span>
+            <span class="n">repoGitHub</span><span class="o">.</span><span class="n">cloneRepo</span><span class="p">(</span><span class="s2">&quot;result.txt&quot;</span><span class="p">)</span>
+            <span class="n">repoGitHub</span><span class="o">.</span><span class="n">removeRepo</span><span class="p">(</span><span class="s2">&quot;result.txt&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertFalse</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">repoGitHub</span><span class="o">.</span><span class="n">repo_folder_name</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="TestRepoGitHub.test_remove_repo_neg"><a class="viewcode-back" href="../../../src.tests.html#src.tests.test_repo_github.TestRepoGitHub.test_remove_repo_neg">[docs]</a>    <span class="k">def</span> <span class="nf">test_remove_repo_neg</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Negative test for removing repository</span>
+
+<span class="sd">        Check whether the function removeRepo() fails to remove the repo from a local directory</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;testcases/test_clone_repo_pos.txt&quot;</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">dataJSON</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+            <span class="n">repoGitHub</span> <span class="o">=</span> <span class="n">RepoGitHub</span><span class="p">(</span><span class="n">dataJSON</span><span class="p">)</span>
+            <span class="n">repoGitHub</span><span class="o">.</span><span class="n">cloneRepo</span><span class="p">(</span><span class="s2">&quot;result.txt&quot;</span><span class="p">)</span>
+            <span class="n">wrong_path</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span>
+            <span class="n">repoGitHub</span><span class="o">.</span><span class="n">repo_path_name</span> <span class="o">=</span> <span class="n">wrong_path</span>
+            <span class="n">repoGitHub</span><span class="o">.</span><span class="n">removeRepo</span><span class="p">(</span><span class="s2">&quot;result.txt&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">repoGitHub</span><span class="o">.</span><span class="n">repo_folder_name</span><span class="p">))</span></div></div>
+
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Elin Liu, Ouday Ahmed, Christofer Vikström, Oscar Knowles, Yiming Ju.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.app.continuous_integration &mdash; Continuous-Integration 1.0.0 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> Continuous-Integration
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">Continuous-Integration</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Continuous-Integration</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">src.app.continuous_integration</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for src.app.continuous_integration</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">smtplib</span>
+<span class="kn">import</span> <span class="nn">ssl</span>
+<span class="kn">from</span> <span class="nn">sys</span> <span class="kn">import</span> <span class="n">platform</span>
+
+<span class="kn">import</span> <span class="nn">subprocess</span>
+<span class="kn">from</span> <span class="nn">email.message</span> <span class="kn">import</span> <span class="n">EmailMessage</span>
+
+
+<span class="sd">&quot;&quot;&quot;Continuous Integration&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="ContinuousIntegration"><a class="viewcode-back" href="../../../src.app.html#src.app.continuous_integration.ContinuousIntegration">[docs]</a><span class="k">class</span> <span class="nc">ContinuousIntegration</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Continuous Integration class.</span>
+
+<span class="sd">    :ivar: repo_path: Path to the project repository locally.</span>
+<span class="sd">    :type: path</span>
+<span class="sd">    :ivar: resultFileName: Name of the result file containing date stamp and person who did pull request.</span>
+<span class="sd">    :type: string</span>
+<span class="sd">    :ivar: isRequirementsInstalled: Check if requirements are installed.</span>
+<span class="sd">    :type: boolean</span>
+<span class="sd">    :ivar: isSyntaxCheckingSucceeded: Check if the syntax is ok.</span>
+<span class="sd">    :type: boolean</span>
+<span class="sd">    :ivar: isTestingSucceeded: Check if all tests passed.</span>
+<span class="sd">    :type: boolean</span>
+<span class="sd">    :ivar: pathOSResults: Path to results folder in OS.</span>
+<span class="sd">    :type: path</span>
+<span class="sd">    :ivar: pathSrc: Path to source folder in OS.</span>
+<span class="sd">    :type: path</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">repo_path</span><span class="p">,</span> <span class="n">resultFileName</span><span class="p">,</span> <span class="n">pathOSResults</span><span class="p">,</span> <span class="n">pathOSSrc</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Initializing the object.</span>
+
+<span class="sd">        :param repo_path: Path to the project repository locally.</span>
+<span class="sd">        :type: repo_path: path</span>
+<span class="sd">        :param resultFileName: Name of the result file containing time stamp and person who did pull request.</span>
+<span class="sd">        :type: resultFileName: string</span>
+<span class="sd">        :param pathOSResults: Path to results folder in OS.</span>
+<span class="sd">        :type: pathOSResults: path</span>
+<span class="sd">        :param pathOSSrc: Path to source folder in OS.</span>
+<span class="sd">        :type: PathOSSrc: path</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">repo_path</span> <span class="o">=</span> <span class="n">repo_path</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">resultFileName</span> <span class="o">=</span> <span class="n">resultFileName</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">isRequirementsInstalled</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">isSyntaxCheckingSucceeded</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">isTestingSucceeded</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pathOSResults</span> <span class="o">=</span> <span class="n">pathOSResults</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pathSrc</span> <span class="o">=</span> <span class="n">pathOSSrc</span>
+
+<div class="viewcode-block" id="ContinuousIntegration.installRequirements"><a class="viewcode-back" href="../../../src.app.html#src.app.continuous_integration.ContinuousIntegration.installRequirements">[docs]</a>    <span class="k">def</span> <span class="nf">installRequirements</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Method to install all the requirements needed for continuous integration and write results to a file.</span>
+
+<span class="sd">        :returns: Print statement that the installation of requirements either failed or succeeded.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">pathOSResults</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">resultFileName</span><span class="p">),</span> <span class="s1">&#39;a&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">resultFile</span><span class="p">:</span>
+            <span class="n">resultFile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;2. Installing the requirements</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">resultFile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;=================================================================================</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">repo_path</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">pathOSResults</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">resultFileName</span><span class="p">),</span> <span class="s1">&#39;a&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">resultFile</span><span class="p">:</span>
+                <span class="n">resultFile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;The requirements file is missing.</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">path_req</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">repo_path</span> <span class="o">+</span> <span class="s2">&quot;/src/requirements.txt&quot;</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">pathOSResults</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">resultFileName</span><span class="p">),</span> <span class="s1">&#39;a&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">resultFile</span><span class="p">:</span>
+                <span class="n">subprocess</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="s2">&quot;pip install -r &quot;</span> <span class="o">+</span> <span class="n">path_req</span><span class="p">,</span> <span class="n">shell</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">stdout</span><span class="o">=</span><span class="n">resultFile</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">isRequirementsInstalled</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">isRequirementsInstalled</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Requirements installing succeeded.&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Requirements installing failed.&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ContinuousIntegration.staticSyntaxCheck"><a class="viewcode-back" href="../../../src.app.html#src.app.continuous_integration.ContinuousIntegration.staticSyntaxCheck">[docs]</a>    <span class="k">def</span> <span class="nf">staticSyntaxCheck</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Method to check if syntax is correct and write the results to a file.</span>
+
+<span class="sd">        :return: Print statement that checking the syntax either failed or succeeded.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">resultFileName</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">pathOSResults</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">resultFileName</span><span class="p">),</span> <span class="s1">&#39;a&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">resultFile</span><span class="p">:</span>
+                <span class="n">resultFile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">2. Syntax checking</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="n">resultFile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;=================================================================================</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">pathOSResults</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">resultFileName</span><span class="p">),</span> <span class="s1">&#39;a&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">resultFile</span><span class="p">:</span>
+                <span class="n">subprocess</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="s2">&quot;pylint --disable=W,C,R,E0401 &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">repo_path</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">pathSrc</span><span class="p">,</span> <span class="n">shell</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">stdout</span><span class="o">=</span><span class="n">resultFile</span><span class="p">)</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;results&quot;</span> <span class="o">+</span> <span class="p">(</span><span class="s2">&quot;/&quot;</span> <span class="k">if</span> <span class="n">platform</span> <span class="o">!=</span> <span class="s2">&quot;win32&quot;</span> <span class="k">else</span> <span class="s2">&quot;</span><span class="se">\\</span><span class="s2">&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">resultFileName</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">resultFile</span><span class="p">:</span>
+                <span class="n">result</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">resultFile</span><span class="p">:</span>
+                    <span class="n">result</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s1">&#39;E\d\d\d\d:&#39;</span><span class="p">,</span> <span class="n">l</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">result</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">isSyntaxCheckingSucceeded</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">isSyntaxCheckingSucceeded</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Syntax checking succeeded.&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Syntax checking failed.&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">isSyntaxCheckingSucceeded</span> <span class="o">=</span> <span class="kc">False</span></div>
+<div class="viewcode-block" id="ContinuousIntegration.testing"><a class="viewcode-back" href="../../../src.app.html#src.app.continuous_integration.ContinuousIntegration.testing">[docs]</a>    <span class="k">def</span> <span class="nf">testing</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Method to test that the CI server works and write the results to a file.</span>
+
+<span class="sd">        :return: Print statement that the testing either failed or succeeded.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">resultFileName</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">pathOSResults</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">resultFileName</span><span class="p">),</span> <span class="s1">&#39;a&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">resultFile</span><span class="p">:</span>
+                <span class="n">resultFile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;3. Testing</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="n">resultFile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;=================================================================================</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">pathOSResults</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">resultFileName</span><span class="p">),</span> <span class="s1">&#39;a&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">resultFile</span><span class="p">:</span>
+                <span class="n">subprocess</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="s2">&quot;python -m unittest discover &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">repo_path</span><span class="p">,</span> <span class="n">shell</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="n">resultFile</span><span class="p">)</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;results&quot;</span> <span class="o">+</span> <span class="p">(</span><span class="s2">&quot;/&quot;</span> <span class="k">if</span> <span class="n">platform</span> <span class="o">!=</span> <span class="s2">&quot;win32&quot;</span> <span class="k">else</span> <span class="s2">&quot;</span><span class="se">\\</span><span class="s2">&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">resultFileName</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="s2">&quot;FAILED&quot;</span> <span class="ow">in</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">isTestingSucceeded</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">isTestingSucceeded</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Testing succeeded.&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Testing failed.&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ContinuousIntegration.sendNotification"><a class="viewcode-back" href="../../../src.app.html#src.app.continuous_integration.ContinuousIntegration.sendNotification">[docs]</a>    <span class="k">def</span> <span class="nf">sendNotification</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">userSender</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Method to send message through email with with build results to user email</span>
+<span class="sd">        :return: Results of build</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">team_dict</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;OudayAhmed&#39;</span><span class="p">:</span> <span class="s2">&quot;oydddua@gmail.com&quot;</span><span class="p">,</span>
+            <span class="s1">&#39;ChristoferVikstroem&#39;</span><span class="p">:</span> <span class="s2">&quot;christofer.vikstrom@outlook.com&quot;</span><span class="p">,</span>
+            <span class="s1">&#39;eliu1217&#39;</span><span class="p">:</span> <span class="s2">&quot;eliu@kth.se&quot;</span><span class="p">,</span>
+            <span class="s1">&#39;OscarKnowles&#39;</span><span class="p">:</span> <span class="s2">&quot;Oscar@knowles.se&quot;</span><span class="p">,</span>
+            <span class="s1">&#39;Taomyee&#39;</span><span class="p">:</span> <span class="s2">&quot;yimingju2000@gmail.com&quot;</span>
+        <span class="p">}</span>
+        <span class="n">email_message</span> <span class="o">=</span> <span class="n">EmailMessage</span><span class="p">()</span>
+        <span class="n">email_message</span><span class="p">[</span><span class="s1">&#39;Subject&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Build Results&#39;</span>
+        <span class="n">syntaxCheckingResult</span> <span class="o">=</span> <span class="s2">&quot;succeeded&quot;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">isSyntaxCheckingSucceeded</span> <span class="k">else</span> <span class="s2">&quot;failed&quot;</span>
+        <span class="n">testingResult</span> <span class="o">=</span> <span class="s2">&quot;succeeded&quot;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">isTestingSucceeded</span> <span class="k">else</span> <span class="s2">&quot;failed&quot;</span>
+        <span class="n">resultDetails</span> <span class="o">=</span> <span class="s2">&quot;.</span><span class="se">\n</span><span class="s2">For more details: http://localhost:8015/results/&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">resultFileName</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Syntax checking &quot;</span> <span class="o">+</span> <span class="n">syntaxCheckingResult</span> <span class="o">+</span> <span class="s2">&quot;.</span><span class="se">\n</span><span class="s2">Testing &quot;</span> <span class="o">+</span> <span class="n">testingResult</span> <span class="o">+</span> <span class="n">resultDetails</span>
+        <span class="n">email_message</span><span class="o">.</span><span class="n">set_content</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="k">with</span> <span class="n">smtplib</span><span class="o">.</span><span class="n">SMTP_SSL</span><span class="p">(</span><span class="s1">&#39;smtp.gmail.com&#39;</span><span class="p">,</span> <span class="mi">465</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="n">ssl</span><span class="o">.</span><span class="n">create_default_context</span><span class="p">())</span> <span class="k">as</span> <span class="n">stmp</span><span class="p">:</span>
+            <span class="n">stmp</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;CI_EMAIL&#39;</span><span class="p">),</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;CI_EMAIL_PASSWORD&#39;</span><span class="p">))</span>
+            <span class="n">stmp</span><span class="o">.</span><span class="n">sendmail</span><span class="p">(</span><span class="s1">&#39;cigroup15vt23@gmail.com&#39;</span><span class="p">,</span> <span class="n">team_dict</span><span class="p">[</span><span class="n">userSender</span><span class="p">],</span> <span class="n">email_message</span><span class="o">.</span><span class="n">as_string</span><span class="p">())</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;The email notification has been sent&quot;</span><span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Elin Liu, Ouday Ahmed, Christofer Vikström, Oscar Knowles, Yiming Ju.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

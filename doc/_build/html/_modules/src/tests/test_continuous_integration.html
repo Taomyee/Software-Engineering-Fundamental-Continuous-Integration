@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.tests.test_continuous_integration &mdash; Continuous-Integration 1.0.0 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> Continuous-Integration
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">Continuous-Integration</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Continuous-Integration</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">src.tests.test_continuous_integration</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for src.tests.test_continuous_integration</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">from</span> <span class="nn">unittest</span> <span class="kn">import</span> <span class="n">TestCase</span>
+
+<span class="kn">from</span> <span class="nn">src.app.build_results</span> <span class="kn">import</span> <span class="n">BuildResults</span>
+<span class="kn">from</span> <span class="nn">src.app.continuous_integration</span> <span class="kn">import</span> <span class="n">ContinuousIntegration</span>
+<span class="kn">from</span> <span class="nn">src.app.repo_github</span> <span class="kn">import</span> <span class="n">RepoGitHub</span>
+
+
+<div class="viewcode-block" id="TestContinuousIntegration"><a class="viewcode-back" href="../../../src.tests.html#src.tests.test_continuous_integration.TestContinuousIntegration">[docs]</a><span class="k">class</span> <span class="nc">TestContinuousIntegration</span><span class="p">(</span><span class="n">TestCase</span><span class="p">):</span>
+
+<div class="viewcode-block" id="TestContinuousIntegration.test_install_requirements_positive"><a class="viewcode-back" href="../../../src.tests.html#src.tests.test_continuous_integration.TestContinuousIntegration.test_install_requirements_positive">[docs]</a>    <span class="k">def</span> <span class="nf">test_install_requirements_positive</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Valid test for install_requirements method, asserts that requirements are installed</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;testcases/data_test_ci.json&quot;</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="n">repo</span> <span class="o">=</span> <span class="n">RepoGitHub</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="n">buildResults</span> <span class="o">=</span> <span class="n">BuildResults</span><span class="p">(</span><span class="n">repo</span><span class="p">)</span>
+        <span class="n">repo</span><span class="o">.</span><span class="n">cloneRepo</span><span class="p">(</span><span class="n">buildResults</span><span class="o">.</span><span class="n">resultFileName</span><span class="p">)</span>
+        <span class="n">ci_server</span> <span class="o">=</span> <span class="n">ContinuousIntegration</span><span class="p">(</span><span class="n">repo</span><span class="o">.</span><span class="n">repo_path</span><span class="p">,</span> <span class="n">buildResults</span><span class="o">.</span><span class="n">resultFileName</span><span class="p">,</span> <span class="n">repo</span><span class="o">.</span><span class="n">OSPathResults</span><span class="p">,</span> <span class="n">repo</span><span class="o">.</span><span class="n">OSPathSrc</span><span class="p">)</span>
+        <span class="n">ci_server</span><span class="o">.</span><span class="n">installRequirements</span><span class="p">()</span>
+        <span class="n">repo</span><span class="o">.</span><span class="n">removeRepo</span><span class="p">(</span><span class="n">buildResults</span><span class="o">.</span><span class="n">resultFileName</span><span class="p">)</span>
+        <span class="n">buildResults</span><span class="o">.</span><span class="n">resultFile</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">ci_server</span><span class="o">.</span><span class="n">isRequirementsInstalled</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TestContinuousIntegration.test_install_requirements_wrong_path"><a class="viewcode-back" href="../../../src.tests.html#src.tests.test_continuous_integration.TestContinuousIntegration.test_install_requirements_wrong_path">[docs]</a>    <span class="k">def</span> <span class="nf">test_install_requirements_wrong_path</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Invalid test requirements for install_requirements method, asserts that requirements are not installed</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;testcases/data_test_ci.json&quot;</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="n">repo</span> <span class="o">=</span> <span class="n">RepoGitHub</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="n">buildResults</span> <span class="o">=</span> <span class="n">BuildResults</span><span class="p">(</span><span class="n">repo</span><span class="p">)</span>
+        <span class="n">repo</span><span class="o">.</span><span class="n">cloneRepo</span><span class="p">(</span><span class="n">buildResults</span><span class="o">.</span><span class="n">resultFileName</span><span class="p">)</span>
+        <span class="n">ci_server</span> <span class="o">=</span> <span class="n">ContinuousIntegration</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">buildResults</span><span class="o">.</span><span class="n">resultFileName</span><span class="p">,</span> <span class="n">repo</span><span class="o">.</span><span class="n">OSPathResults</span><span class="p">,</span>
+                                          <span class="n">repo</span><span class="o">.</span><span class="n">OSPathSrc</span><span class="p">)</span>
+        <span class="n">ci_server</span><span class="o">.</span><span class="n">installRequirements</span><span class="p">()</span>
+        <span class="n">repo</span><span class="o">.</span><span class="n">removeRepo</span><span class="p">(</span><span class="n">buildResults</span><span class="o">.</span><span class="n">resultFileName</span><span class="p">)</span>
+        <span class="n">buildResults</span><span class="o">.</span><span class="n">resultFile</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertFalse</span><span class="p">(</span><span class="n">ci_server</span><span class="o">.</span><span class="n">isRequirementsInstalled</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TestContinuousIntegration.test_static_syntax_check_positive"><a class="viewcode-back" href="../../../src.tests.html#src.tests.test_continuous_integration.TestContinuousIntegration.test_static_syntax_check_positive">[docs]</a>    <span class="k">def</span> <span class="nf">test_static_syntax_check_positive</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Valid test for syntax_check method, asserts that syntax succeeded.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;testcases/data_test_ci.json&quot;</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="n">repo</span> <span class="o">=</span> <span class="n">RepoGitHub</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="n">buildResults</span> <span class="o">=</span> <span class="n">BuildResults</span><span class="p">(</span><span class="n">repo</span><span class="p">)</span>
+        <span class="n">repo</span><span class="o">.</span><span class="n">cloneRepo</span><span class="p">(</span><span class="n">buildResults</span><span class="o">.</span><span class="n">resultFileName</span><span class="p">)</span>
+        <span class="n">ci_server</span> <span class="o">=</span> <span class="n">ContinuousIntegration</span><span class="p">(</span><span class="n">repo</span><span class="o">.</span><span class="n">repo_path</span><span class="p">,</span> <span class="n">buildResults</span><span class="o">.</span><span class="n">resultFileName</span><span class="p">,</span> <span class="n">repo</span><span class="o">.</span><span class="n">OSPathResults</span><span class="p">,</span>
+                                          <span class="n">repo</span><span class="o">.</span><span class="n">OSPathSrc</span><span class="p">)</span>
+        <span class="n">ci_server</span><span class="o">.</span><span class="n">installRequirements</span><span class="p">()</span>
+        <span class="n">ci_server</span><span class="o">.</span><span class="n">staticSyntaxCheck</span><span class="p">()</span>
+        <span class="n">repo</span><span class="o">.</span><span class="n">removeRepo</span><span class="p">(</span><span class="n">buildResults</span><span class="o">.</span><span class="n">resultFileName</span><span class="p">)</span>
+        <span class="n">buildResults</span><span class="o">.</span><span class="n">resultFile</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">ci_server</span><span class="o">.</span><span class="n">isSyntaxCheckingSucceeded</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TestContinuousIntegration.test_static_syntax_check_wrong_result_file_name"><a class="viewcode-back" href="../../../src.tests.html#src.tests.test_continuous_integration.TestContinuousIntegration.test_static_syntax_check_wrong_result_file_name">[docs]</a>    <span class="k">def</span> <span class="nf">test_static_syntax_check_wrong_result_file_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Invalid test for syntax_check method, asserts that syntax is not succeeded.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;testcases/data_test_ci.json&quot;</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="n">repo</span> <span class="o">=</span> <span class="n">RepoGitHub</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="n">buildResults</span> <span class="o">=</span> <span class="n">BuildResults</span><span class="p">(</span><span class="n">repo</span><span class="p">)</span>
+        <span class="n">repo</span><span class="o">.</span><span class="n">cloneRepo</span><span class="p">(</span><span class="n">buildResults</span><span class="o">.</span><span class="n">resultFileName</span><span class="p">)</span>
+        <span class="n">ci_server</span> <span class="o">=</span> <span class="n">ContinuousIntegration</span><span class="p">(</span><span class="n">repo</span><span class="o">.</span><span class="n">repo_path</span><span class="p">,</span> <span class="n">buildResults</span><span class="o">.</span><span class="n">resultFileName</span><span class="p">,</span> <span class="n">repo</span><span class="o">.</span><span class="n">OSPathResults</span><span class="p">,</span>
+                                          <span class="n">repo</span><span class="o">.</span><span class="n">OSPathSrc</span><span class="p">)</span>
+        <span class="n">ci_server</span><span class="o">.</span><span class="n">installRequirements</span><span class="p">()</span>
+        <span class="n">ci_server</span><span class="o">.</span><span class="n">resultFileName</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="n">ci_server</span><span class="o">.</span><span class="n">staticSyntaxCheck</span><span class="p">()</span>
+        <span class="n">repo</span><span class="o">.</span><span class="n">removeRepo</span><span class="p">(</span><span class="n">buildResults</span><span class="o">.</span><span class="n">resultFileName</span><span class="p">)</span>
+        <span class="n">buildResults</span><span class="o">.</span><span class="n">resultFile</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertFalse</span><span class="p">(</span><span class="n">ci_server</span><span class="o">.</span><span class="n">isSyntaxCheckingSucceeded</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TestContinuousIntegration.test_testing_positive"><a class="viewcode-back" href="../../../src.tests.html#src.tests.test_continuous_integration.TestContinuousIntegration.test_testing_positive">[docs]</a>    <span class="k">def</span> <span class="nf">test_testing_positive</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Valid test method, asserts that tests are succeeded.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;testcases/data_test_ci.json&quot;</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="n">repo</span> <span class="o">=</span> <span class="n">RepoGitHub</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="n">buildResults</span> <span class="o">=</span> <span class="n">BuildResults</span><span class="p">(</span><span class="n">repo</span><span class="p">)</span>
+        <span class="n">repo</span><span class="o">.</span><span class="n">cloneRepo</span><span class="p">(</span><span class="n">buildResults</span><span class="o">.</span><span class="n">resultFileName</span><span class="p">)</span>
+        <span class="n">ci_server</span> <span class="o">=</span> <span class="n">ContinuousIntegration</span><span class="p">(</span><span class="n">repo</span><span class="o">.</span><span class="n">repo_path</span><span class="p">,</span> <span class="n">buildResults</span><span class="o">.</span><span class="n">resultFileName</span><span class="p">,</span> <span class="n">repo</span><span class="o">.</span><span class="n">OSPathResults</span><span class="p">,</span>
+                                          <span class="n">repo</span><span class="o">.</span><span class="n">OSPathSrc</span><span class="p">)</span>
+        <span class="n">ci_server</span><span class="o">.</span><span class="n">installRequirements</span><span class="p">()</span>
+        <span class="n">ci_server</span><span class="o">.</span><span class="n">testing</span><span class="p">()</span>
+        <span class="n">repo</span><span class="o">.</span><span class="n">removeRepo</span><span class="p">(</span><span class="n">buildResults</span><span class="o">.</span><span class="n">resultFileName</span><span class="p">)</span>
+        <span class="n">buildResults</span><span class="o">.</span><span class="n">resultFile</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">ci_server</span><span class="o">.</span><span class="n">isTestingSucceeded</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TestContinuousIntegration.test_testing_wrong_result_file_name"><a class="viewcode-back" href="../../../src.tests.html#src.tests.test_continuous_integration.TestContinuousIntegration.test_testing_wrong_result_file_name">[docs]</a>    <span class="k">def</span> <span class="nf">test_testing_wrong_result_file_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Invalid test method, asserts that tests are not succeeded.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;testcases/data_test_ci.json&quot;</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="n">repo</span> <span class="o">=</span> <span class="n">RepoGitHub</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="n">buildResults</span> <span class="o">=</span> <span class="n">BuildResults</span><span class="p">(</span><span class="n">repo</span><span class="p">)</span>
+        <span class="n">repo</span><span class="o">.</span><span class="n">cloneRepo</span><span class="p">(</span><span class="n">buildResults</span><span class="o">.</span><span class="n">resultFileName</span><span class="p">)</span>
+        <span class="n">ci_server</span> <span class="o">=</span> <span class="n">ContinuousIntegration</span><span class="p">(</span><span class="n">repo</span><span class="o">.</span><span class="n">repo_path</span><span class="p">,</span> <span class="n">buildResults</span><span class="o">.</span><span class="n">resultFileName</span><span class="p">,</span> <span class="n">repo</span><span class="o">.</span><span class="n">OSPathResults</span><span class="p">,</span>
+                                          <span class="n">repo</span><span class="o">.</span><span class="n">OSPathSrc</span><span class="p">)</span>
+        <span class="n">ci_server</span><span class="o">.</span><span class="n">installRequirements</span><span class="p">()</span>
+        <span class="n">ci_server</span><span class="o">.</span><span class="n">resultFileName</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="n">ci_server</span><span class="o">.</span><span class="n">testing</span><span class="p">()</span>
+        <span class="n">repo</span><span class="o">.</span><span class="n">removeRepo</span><span class="p">(</span><span class="n">buildResults</span><span class="o">.</span><span class="n">resultFileName</span><span class="p">)</span>
+        <span class="n">buildResults</span><span class="o">.</span><span class="n">resultFile</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertFalse</span><span class="p">(</span><span class="n">ci_server</span><span class="o">.</span><span class="n">isTestingSucceeded</span><span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Elin Liu, Ouday Ahmed, Christofer Vikström, Oscar Knowles, Yiming Ju.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

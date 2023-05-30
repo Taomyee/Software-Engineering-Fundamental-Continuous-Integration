@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.app.repo_github &mdash; Continuous-Integration 1.0.0 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> Continuous-Integration
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">Continuous-Integration</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Continuous-Integration</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">src.app.repo_github</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for src.app.repo_github</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">git</span> <span class="kn">import</span> <span class="n">Repo</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">tempfile</span>
+<span class="kn">from</span> <span class="nn">git</span> <span class="kn">import</span> <span class="n">rmtree</span>
+<span class="kn">from</span> <span class="nn">sys</span> <span class="kn">import</span> <span class="n">platform</span>
+
+<span class="sd">&quot;&quot;&quot;RepoGitHub class&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="RepoGitHub"><a class="viewcode-back" href="../../../src.app.html#src.app.repo_github.RepoGitHub">[docs]</a><span class="k">class</span> <span class="nc">RepoGitHub</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; RepoGitHub class</span>
+
+<span class="sd">    :ivar: data: a json file recording the POST request</span>
+<span class="sd">    :type: data: dict</span>
+<span class="sd">    :ivar: repo_name: the repository name</span>
+<span class="sd">    :type: repo_name: string</span>
+<span class="sd">    :ivar: branch_name: the branch name</span>
+<span class="sd">    :type: branch_name: string</span>
+<span class="sd">    :ivar: clone_url: the url of clone repository</span>
+<span class="sd">    :type: clone_url: string</span>
+<span class="sd">    :ivar: userSender: the user that sends the request</span>
+<span class="sd">    :type: userSender: string</span>
+<span class="sd">    :ivar: action: the action of the request</span>
+<span class="sd">    :type: action: string</span>
+<span class="sd">    :ivar: repo_path: the repository path locally</span>
+<span class="sd">    :type: repo_path: string</span>
+<span class="sd">    :ivar: repo_folder_name: the name of repository folder</span>
+<span class="sd">    :type: repo_folder_name: string</span>
+<span class="sd">    :ivar: isCloned: whether the repository is cloned</span>
+<span class="sd">    :type: isCloned: bool</span>
+<span class="sd">    :ivar: isRemoved: whether the repository is removed</span>
+<span class="sd">    :type: isRemoved: bool</span>
+<span class="sd">    :ivar: OSPathResults: OS path of results folder</span>
+<span class="sd">    :type: OSPathResults: string</span>
+<span class="sd">    :ivar: OSPathSrc: OS path of src folder</span>
+<span class="sd">    :type: OSPathSrc: string</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Initializing the class</span>
+
+<span class="sd">        :param data: a json file</span>
+<span class="sd">        :type data: dict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">data</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">repo_name</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;pull_request&#39;</span><span class="p">][</span><span class="s1">&#39;head&#39;</span><span class="p">][</span><span class="s1">&#39;repo&#39;</span><span class="p">][</span><span class="s1">&#39;name&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">branch_name</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;pull_request&#39;</span><span class="p">][</span><span class="s1">&#39;head&#39;</span><span class="p">][</span><span class="s1">&#39;ref&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">clone_url</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;pull_request&#39;</span><span class="p">][</span><span class="s1">&#39;head&#39;</span><span class="p">][</span><span class="s1">&#39;repo&#39;</span><span class="p">][</span><span class="s1">&#39;clone_url&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">userSender</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;sender&#39;</span><span class="p">][</span><span class="s1">&#39;login&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">action</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;action&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">repo_path</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">repo_folder_name</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">isCloned</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">isRemoved</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">OSPathResults</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">OSPathSrc</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">checkOS</span><span class="p">()</span>
+
+<div class="viewcode-block" id="RepoGitHub.cloneRepo"><a class="viewcode-back" href="../../../src.app.html#src.app.repo_github.RepoGitHub.cloneRepo">[docs]</a>    <span class="k">def</span> <span class="nf">cloneRepo</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resultFileName</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Clone the repository to the local</span>
+
+<span class="sd">        :param resultFileName: the folder name of result files</span>
+<span class="sd">        :type resultFileName: string</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">OSPathResults</span><span class="p">,</span> <span class="n">resultFileName</span><span class="p">),</span> <span class="s1">&#39;a&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">resultFile</span><span class="p">:</span>
+            <span class="n">resultFile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;1. Cloning the Repo</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">resultFile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;=================================================================================</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">repo_name</span><span class="p">:</span>
+                <span class="n">resultFile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;The repo name is missing.</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">branch_name</span><span class="p">:</span>
+                <span class="n">resultFile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;The branch name is missing.</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">userSender</span><span class="p">:</span>
+                <span class="n">resultFile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;Username is missing.</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">resultFile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Cloning the </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">repo_name</span><span class="si">}</span><span class="s1"> repo from the </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">branch_name</span><span class="si">}</span><span class="s1"> branch after a &#39;</span>
+                                 <span class="sa">f</span><span class="s1">&#39;pull</span><span class="se">\n</span><span class="s1">request is </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">action</span><span class="si">}</span><span class="s1"> by </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">userSender</span><span class="si">}</span><span class="s1">.</span><span class="se">\n\n</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">repo_path</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">(</span><span class="nb">dir</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">())</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">repo_folder_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">repo_path</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">())</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:]</span>
+                <span class="n">Repo</span><span class="o">.</span><span class="n">clone_from</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">clone_url</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">repo_path</span><span class="p">,</span> <span class="n">branch</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">branch_name</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">isCloned</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">isCloned</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">repo_name</span><span class="si">}</span><span class="s1"> repo cloning succeeded.&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">repo_name</span><span class="si">}</span><span class="s1"> repo cloning failed.&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="RepoGitHub.removeRepo"><a class="viewcode-back" href="../../../src.app.html#src.app.repo_github.RepoGitHub.removeRepo">[docs]</a>    <span class="k">def</span> <span class="nf">removeRepo</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resultFileName</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Remove the repository from the local</span>
+
+<span class="sd">        :param resultFileName: the folder name of result files</span>
+<span class="sd">        :type resultFileName: string</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">OSPathResults</span><span class="p">,</span> <span class="n">resultFileName</span><span class="p">),</span> <span class="s1">&#39;a&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">resultFile</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">repo_path</span><span class="p">:</span>
+                <span class="n">resultFile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;The repo path is missing.</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">rmtree</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">repo_path</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">isRemoved</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">isCloned</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">repo_name</span><span class="si">}</span><span class="s1"> repo removing succeeded.&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">repo_name</span><span class="si">}</span><span class="s1"> repo removing failed.&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="RepoGitHub.checkOS"><a class="viewcode-back" href="../../../src.app.html#src.app.repo_github.RepoGitHub.checkOS">[docs]</a>    <span class="k">def</span> <span class="nf">checkOS</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Store the path according to different operating systems</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">platform</span> <span class="o">==</span> <span class="s2">&quot;darwin&quot;</span> <span class="ow">or</span> <span class="n">platform</span> <span class="o">==</span> <span class="s2">&quot;linux&quot;</span> <span class="ow">or</span> <span class="n">platform</span> <span class="o">==</span> <span class="s2">&quot;linux2&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">OSPathResults</span> <span class="o">=</span> <span class="s2">&quot;/results&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">OSPathSrc</span> <span class="o">=</span> <span class="s2">&quot;/src&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">OSPathResults</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\\</span><span class="s2">results&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">OSPathSrc</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\\</span><span class="s2">src&quot;</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Elin Liu, Ouday Ahmed, Christofer Vikström, Oscar Knowles, Yiming Ju.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
